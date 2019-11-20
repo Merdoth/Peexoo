@@ -1,28 +1,18 @@
-# peexoo-test
+# Instructions
 
 ## Project setup
 ```
-yarn install
+clone repository and run `npm install` on your terminal
 ```
 
 ### Compiles and hot-reloads for development
 ```
-yarn run serve
+npm run serve
 ```
 
-### Compiles and minifies for production
+### Note:
 ```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
+Component isn't responsive, only works well on some laptop devices
 ```
 
 ### Customize configuration
