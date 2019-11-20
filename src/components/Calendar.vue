@@ -1,56 +1,72 @@
 <template>
   <div id="calendar">
    <div class="calendar-container july">
-      <div class="calendar-header">
-          <span class="calendar-month">July</span>
+          <div class="calendar-header">
+          <span class="calendar-month">{{ month[currentDate.month ] +' '+ currentDate.year}}</span>
       </div>
         <div class="date">
               <div class="day_name" v-for="(day, index) in days" :key="index">
               {{day}}
           </div>
-           <div id="augustDay" class="days"></div> 
-          <div  @click="disabled($event)" class="days" v-for="(monthDay, index) in monthDays.julyAugust" :key="index">
+             <div id="augustDay" v-for="(n, index) in (firstMonthDay -1)" :key="'prev'+index">
+          {{ (prevMonthDays +1) - firstMonthDay + n }}
+        </div>
+          <div 
+          @click="disabled($event)" 
+          :class="{ active: monthDay === currentDate.date}"
+          class="days" v-for="(monthDay, index) in currentMonthDays" 
+          :key="index">
               {{monthDay}}
           </div>
       </div>
    </div>
-   <div class="calendar-container august">
+   <!-- <div class="calendar-container august">
       <div class="calendar-header">
-          <span class="calendar-month">August</span>
+          <span class="calendar-month">{{ month[currentDate.month + 1]}}</span>
       </div>
       <div class="date">
               <div class="day_name" v-for="(day, index) in days" :key="index">
               {{day}}
           </div>
-           <div id="augustDay" class="days"></div> 
-           <div id="augustDay" class="days"></div>
-           <div id="augustDay" class="days"></div>
-           <div id="augustDay" class="days"></div>
-          <div @click="disabled($event)" class="days" v-for="(monthDay, index) in monthDays.julyAugust" :key="index">
+             <div id="augustDay" v-for="(n, index) in (firstMonthDay -1)" :key="'prev'+index">
+          {{ (prevMonthDays +1) - firstMonthDay + n }}
+        </div>
+          <div 
+          @click="disabled($event)" 
+          :class="{ active: monthDay === currentDate.date}"
+          class="days" v-for="(monthDay, index) in currentMonthDays" 
+          :key="index">
               {{monthDay}}
           </div>
       </div>
    </div>
    <div class="calendar-container september">
       <div class="calendar-header">
-          <span class="calendar-month">September</span>
+          <span class="calendar-month">{{ month[currentDate.month + 1]}}</span>
       </div>
         <div class="date">
               <div class="day_name" v-for="(day, index) in days" :key="index">
               {{day}}
           </div>
-          <div @click="disabled($event)" class="days" v-for="(monthDay, index) in monthDays.september" :key="index">
+             <div id="augustDay" v-for="(n, index) in (firstMonthDay -1)" :key="'prev'+index">
+          {{ (prevMonthDays +1) - firstMonthDay + n }}
+        </div>
+          <div 
+          @click="disabled($event)" 
+          :class="{ active: monthDay === currentDate.date}"
+          class="days" v-for="(monthDay, index) in currentMonthDays" 
+          :key="index">
               {{monthDay}}
           </div>
       </div>
-   </div>
+   </div> -->
    <div class="calendar-navigation">
-     <div class="greater-than">
+     <div class="greater-than" @click="dateRight()" >
         <p></p>
         <p></p>
-     </div>
+     </div> 
      <div class="inner-circle"></div>
-     <div class="less-than">
+     <div class="less-than" @click="dateLeft()">
          <p></p>
          <p></p>
      </div>
@@ -64,24 +80,84 @@ export default {
   data: function() {
     return {
         active: false,
+        limit: 3,
         days: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-        monthDays: {
-            julyAugust: ['1', '2', '3', '4', '5', '6','7',
-            '8', '9', '10', '11', '12', '13','14','15', '16', '17', '18', '19', '20','21',
-            '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'
-            ],
-            september: ['1', '2', '3', '4', '5', '6','7',
-            '8', '9', '10', '11', '12', '13','14','15', '16', '17', '18', '19', '20','21',
-            '22', '23', '24', '25', '26', '27', '28', '29', '30'
-            ]
+        month: [
+          'January','February','March','April','May','June','July',
+          'August','September','October','November','December'
+        ],
+        currentDate: {
+          date: 0,
+          month: 0,
+          year: 0
         }
     }
   },
+   computed: {
+      prevMonthDays() {
+        let year = this.currentDate.month === 0 ? this.currentDate.year - 1 : this.currentDate.year;
+        let month = this.currentDate.month === 0 ? 12 : this.currentDate.month;
+        return new Date(year, month, 0).getDate();
+      },
+      firstMonthDay() {
+        let firstDay = new Date(this.currentDate.year, this.currentDate.month, 1).getDay();
+        if(firstDay === 0) firstDay = 7;
+        return firstDay;
+      },
+      currentMonthDays() {
+        return new Date(this.currentDate.year, this.currentDate.month +1, 0).getDate();
+      }
+    },
   methods: {
       disabled: function(event) {
-          event.target.classList.toggle('active');
+          event.target.classList.toggle('disabled');
+      },
+      getCurrentDate() {
+        let today = new Date();
+        this.currentDate.date = today.getDate();
+        this.currentDate.month = today.getMonth();
+        this.currentDate.year = today.getFullYear();
+      },
+      dateLeft() {
+        if(this.currentDate.date === this.currentMonthDays) {
+          this.currentDate.date = 1;
+          this.monthUp();
+        }
+        else {
+          this.currentDate.date += 1;
+        }
+      },
+      dateRight() {
+        if(this.currentDate.date === 1) {
+          this.currentDate.date = this.prevMonthDays;
+          this.monthDown();
+        }
+        else {
+          this.currentDate.date -= 1;
+        }
+      },
+      monthUp() {
+        if(this.currentDate.month === 11) {
+          this.currentDate.month = 0;
+          this.currentDate.year += 1;
+        }
+        else {
+          this.currentDate.month += 1;
+        }        
+      },
+      monthDown() {
+        if(this.currentDate.month === 0) {
+          this.currentDate.month = 11;
+          this.currentDate.year -= 1;
+        }
+        else {
+          this.currentDate.month -= 1;
+        } 
       }
-  }
+  },
+  created() {
+      this.getCurrentDate();
+    }
 }
 </script>
 
@@ -113,7 +189,7 @@ left: 0;
 right: 0;
 margin: 0 auto;
 }
-#augustDay:hover{
+#augustDay{
 background-color: #fff;
 opacity: 0;
 }
@@ -145,7 +221,7 @@ margin-top: -10px;
 font-weight: 500;
 }
 .days {
-margin-bottom: 20px;
+margin-bottom: 15px;
 width: 20px;
 height: 18px;
 margin-left: 10px;
@@ -158,10 +234,14 @@ color: #fff;
 background: #ffb505;
 }
 .active {
+background: #ffb505;
+color: #fff;
+}
+.disabled {
 background: #cbcbcb;
 color: #cbcbcb;
 }
-.active:hover {
+.disabled:hover {
  background: #cbcbcb; 
 }
 .calendar-navigation {
